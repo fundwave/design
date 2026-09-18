@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" id="favicon" href="/logo-light.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2563eb" id="theme-color-meta" />
+    
+    <!-- Favicon switching script - must be in head for instant load -->
+    <script>
+      (function() {
+        const favicon = document.getElementById('favicon');
+        const themeColorMeta = document.getElementById('theme-color-meta');
+        
+        function updateFavicon() {
+          const isDark = localStorage.getItem('darkMode') === 'true' || 
+                        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          
+          if (favicon) {
+            favicon.href = isDark ? '/logo-dark.png' : '/logo-light.png';
+          }
+          
+          if (themeColorMeta) {
+            themeColorMeta.content = isDark ? '#111827' : '#2563eb';
+          }
+        }
+        
+        updateFavicon();
+        
+        // Listen for changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+        window.addEventListener('storage', updateFavicon);
+        
+        // Listen for manual dark mode toggle
+        const observer = new MutationObserver(updateFavicon);
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+      })();
+    </script>
+    
+    <!-- Primary Meta Tags -->
+    <title>Design4Devs - Design for Developers | Learn UX & Build Design Systems</title>
+    <meta name="title" content="Design4Devs - Design for Developers | Learn UX & Build Design Systems" />
+    <meta name="description" content="Stop the design ping-pong. Learn UX principles and build professional design systems through interactive guides and step-by-step tutorials." />
+    <meta name="keywords" content="design for developers, UX design, design systems, design tokens, typography, color theory, UI design, web design, usability, Hick's Law, Fitts's Law, Jakob's Law" />
+    <meta name="author" content="Fundwave" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://design.fundwave.dev/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://design.fundwave.dev/" />
+    <meta property="og:title" content="Design4Devs - Design for Developers" />
+    <meta property="og:description" content="Master UX principles and build professional design systems. Learn design tokens, typography, colors, and interactive components." />
+    <meta property="og:site_name" content="Design4Devs" />
+    <meta property="og:image" content="https://design.fundwave.dev/favicons/android-chrome-512x512.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://design.fundwave.dev/" />
+    <meta name="twitter:title" content="Design4Devs - Design for Developers" />
+    <meta name="twitter:description" content="Master UX principles and build professional design systems with interactive guides." />
+    <meta name="twitter:image" content="https://design.fundwave.dev/favicons/android-chrome-512x512.png" />
+    
+    <!-- Additional SEO -->
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- PWA -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Design4Devs" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
