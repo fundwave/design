@@ -5,6 +5,7 @@ Design standards for Fundwave products, and a reusable GitHub Actions workflow t
 ## What's here
 
 - [`.github/workflows/design-ai-review.yml`](./.github/workflows/design-ai-review.yml) — the reusable workflow. It checks out this repo's `instructions/`, builds a review prompt, runs it through the GitHub Copilot CLI, and (optionally) posts the result as a PR comment.
+- [`design4devs/`](./design4devs) — Design for Developers, an interactive site teaching UX principles and design systems to developers. See [`design4devs/README.md`](./design4devs/README.md).
 
 ## Using the reusable workflow in another repo
 

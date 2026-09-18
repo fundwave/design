@@ -1,0 +1,36 @@
+{
+  "name": "design4devs",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Design for Developers - Learn UX principles and build design systems",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "firebase deploy --only hosting"
+  },
+  "dependencies": {
+    "dompurify": "3.3.1",
+    "html2canvas-pro": "1.6.6",
+    "lucide-react": "0.562.0",
+    "marked": "17.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "10.1.0",
+    "react-router-dom": "^6.20.0",
+    "tailwind-merge": "3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "0.5.19",
+    "@tailwindcss/vite": "4.1.18",
+    "@trivago/prettier-plugin-sort-imports": "6.0.2",
+    "@types/react": "19.2.9",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "10.4.23",
+    "postcss": "8.5.6",
+    "tailwindcss": "4.0.0",
+    "typescript": "5.9.3",
+    "vite": "^5.0.7"
+  }
+}

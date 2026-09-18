@@ -1,0 +1,48 @@
+name: Deploy design4devs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "design4devs/**"
+      - ".github/workflows/deploy-design4devs.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    environment: Prod
+    defaults:
+      run:
+        working-directory: design4devs
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: design4devs/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Login to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ vars.GCLOUD_WORKLOAD_IDP }}
+          service_account: ${{ vars.GCLOUD_SERVICE_ACCOUNT_NAME }}
+          access_token_lifetime: 300s
+
+      - name: Deploy to Firebase
+        run: |
+          npm install -g firebase-tools
+          npm run deploy
