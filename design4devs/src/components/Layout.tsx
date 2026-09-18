@@ -3,6 +3,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDarkMode } from "../context/DarkModeContext";
+import LogoLight from "~/assets/logo-light.svg?react";
+import LogoDark from "~/assets/logo-dark.svg?react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,7 +29,11 @@ export default function Layout({ children }: LayoutProps) {
       >
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center h-14">
           <Link to="/" className="flex items-center gap-2 group">
-            <img src={isDark ? "/logo-dark.png" : "/logo-light.png"} alt="Design4Devs" className="h-7 w-auto" />
+            {isDark ? (
+              <LogoLight className="h-7 w-7" />
+            ) : (
+              <LogoDark className="h-7 w-7" />
+            )}
             <span className="font-semibold bg-gradient-to-r from-ocean-500 to-amethyst-500 bg-clip-text text-transparent">Design4Devs</span>
           </Link>
 

@@ -82,17 +82,17 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
             <Trophy className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-medium text-amber-500">Final Challenge</span>
+            <span className="text-sm font-medium text-amber-500">Interactive Challenges</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-3">
-            🕵️ Ready to Test Your Skills?
+            🎮 Ready to Test Your Skills?
           </h2>
           <p className="text-secondary mb-8 max-w-xl mx-auto">
-            After completing all guides, put your knowledge to the test! 
-            Find all the UX violations hidden in a "real" dashboard.
+            Put your design knowledge to the test with interactive quizzes!
+            Find UX violations, spot accessibility issues, and more.
           </p>
-          <Link to={ROUTES.DESIGN_QUIZ} className="group inline-flex items-center gap-3 px-8 py-4 text-white font-semibold rounded-xl transition-all duration-300 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
-            Take the UX Detective Quiz
+          <Link to={ROUTES.QUIZ_HUB} className="group inline-flex items-center gap-3 px-8 py-4 text-white font-semibold rounded-xl transition-all duration-300 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
+            Explore Design Quizzes
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

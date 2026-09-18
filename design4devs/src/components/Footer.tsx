@@ -16,7 +16,7 @@ export default function Footer() {
       <footer className="mt-auto py-6">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-xs text-tertiary">
-            © {new Date().getFullYear()} <span className="bg-gradient-to-r from-ocean-500 to-amethyst-500 bg-clip-text text-transparent font-medium">Fundwave</span>
+            © {new Date().getFullYear()} <span className="bg-gradient-to-r from-ocean-500 to-amethyst-500 bg-clip-text text-transparent font-medium">Design4Devs</span>
           </p>
         </div>
       </footer>

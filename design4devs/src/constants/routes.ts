@@ -6,7 +6,8 @@ export const ROUTES = {
   HOME: "/",
   UX_LAWS_GUIDE: "/ux-laws-guide",
   DESIGN_SYSTEM_GUIDE: "/design-system-guide",
-  DESIGN_QUIZ: "/quiz",
+  QUIZ_HUB: "/quizzes",
+  QUIZ: "/quiz/:quizSlug",
   DS_TOKENS: "/design-system/tokens",
   DS_TYPOGRAPHY: "/design-system/typography",
   DS_COLORS: "/design-system/colors",
@@ -192,14 +193,14 @@ export const COMPONENT_GUIDES: ComponentGuide[] = [
   //   items: DESIGN_SYSTEM_STEPS
   // },
   {
-    path: ROUTES.DESIGN_QUIZ,
-    title: "UX Detective Quiz",
-    emoji: "🕵️",
+    path: ROUTES.QUIZ_HUB,
+    title: "Design Quizzes",
+    emoji: "🎮",
     icon: HatGlasses,
-    description: "Test your knowledge by finding UX violations in a realistic dashboard scenario.",
-    buttonText: "Take the Quiz",
+    description: "Test your knowledge with interactive challenges covering UX laws, accessibility, and more.",
+    buttonText: "Take a Quiz",
     themeColor: "mountain",
-    badgeText: "UX Quiz",
+    badgeText: "Quizzes",
     items: []
   }
 ];

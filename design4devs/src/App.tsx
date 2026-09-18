@@ -9,6 +9,8 @@ import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import ComponentHome from "./pages/ComponentHome";
 import Home from "./pages/Home";
+import { QuizHub } from "./pages/QuizHub";
+import { QuizPage } from "./pages/QuizPage";
 import DesignChecklistPage from "./pages/design/DesignChecklistPage";
 import DesignColors from "./pages/design/DesignColors";
 import DesignComponents from "./pages/design/DesignComponents";
@@ -26,7 +28,6 @@ import ReusablePatterns from "./pages/laws/ReusablePatterns";
 import SymmetryAndAlignment from "./pages/laws/SymmetryAndAlignment";
 import TypographyHierarchy from "./pages/laws/TypographyHierarchy";
 import Whitespace from "./pages/laws/Whitespace";
-import DesignQuiz from "./pages/quiz";
 
 const allComponents: Record<string, React.ComponentType> = {
   [ROUTES.HICKS_LAW]: HicksLaw,
@@ -56,7 +57,8 @@ function App() {
         <Layout>
           <Routes>
             <Route path={ROUTES.HOME} element={<Home />} />
-            <Route path={ROUTES.DESIGN_QUIZ} element={<DesignQuiz />} />
+            <Route path={ROUTES.QUIZ_HUB} element={<QuizHub />} />
+            <Route path="/quiz/:quizSlug" element={<QuizPage />} />
 
           {/* Guide Routes (UX Laws and Design System) */}
           {COMPONENT_GUIDES.map((guide) => (
