@@ -15,3 +15,14 @@ npm run build    # type-check + production build
 npm run preview  # preview the production build
 npm run deploy   # build + firebase deploy
 ```
+
+## Deployment
+
+Pushes to `main` that touch `design4devs/**` are built and deployed to Firebase Hosting automatically by [`.github/workflows/deploy-design4devs.yml`](../.github/workflows/deploy-design4devs.yml), authenticating to Google Cloud via Workload Identity Federation (OIDC) — no static service-account key is stored in the repo.
+
+The workflow needs these repo/environment variables set:
+
+| Variable | Description |
+| --- | --- |
+| `GCLOUD_WORKLOAD_IDP` | Full resource name of the Workload Identity Provider. |
+| `GCLOUD_SERVICE_ACCOUNT_NAME` | Email of the service account to impersonate (needs Firebase Hosting deploy permissions on the `design4devs` project). |
