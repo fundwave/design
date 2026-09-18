@@ -2,7 +2,7 @@ name: Deploy design4devs
 
 on:
   push:
-    branches: [main]
+    branches: [main, design4dev]
     paths:
       - "design4devs/**"
       - ".github/workflows/deploy-design4devs.yml"
