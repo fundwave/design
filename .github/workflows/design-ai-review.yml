@@ -182,7 +182,20 @@ jobs:
         run: |
           COPILOT_PROMPT=$(cat prompt.md)
           [ "${RUNNER_DEBUG:-0}" = "1" ] && echo "$COPILOT_PROMPT" || true
-          copilot -p "$COPILOT_PROMPT" --allow-all-tools --deny-tool 'write' > review.md
+          copilot -p "$COPILOT_PROMPT" \
+            --allow-tool 'read' --allow-tool 'view' --allow-tool 'grep' --allow-tool 'glob' \
+            --deny-tool 'shell' --deny-tool 'write' --deny-tool 'web_fetch' --deny-tool 'web_search' \
+            > review.md
+
+      - name: Verify review output does not leak secrets
+        id: scrub-secrets
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          if [ -n "$COPILOT_GITHUB_TOKEN" ] && grep -qF "$COPILOT_GITHUB_TOKEN" review.md; then
+            echo "::error::Review output contains the COPILOT_GITHUB_TOKEN secret value - refusing to post it. This likely indicates a prompt-injection attempt via the PR title/body/files."
+            exit 1
+          fi
 
       - name: Post review as PR comment
         id: post-comment
