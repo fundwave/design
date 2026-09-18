@@ -35,7 +35,7 @@ export default function Footer() {
             <p className="text-sm text-secondary leading-relaxed mb-4">
               Free interactive lessons to help developers understand UX laws and design system principles. Build better interfaces with confidence.
             </p>
-            <p className="text-xs text-tertiary">© {new Date().getFullYear()} Design4Devs. All rights reserved.</p>
+            <p className="text-xs text-tertiary">© {new Date().getFullYear()} Fundwave. All rights reserved.</p>
           </div>
 
           {/* Links */}
