@@ -8,10 +8,19 @@
 import { QuizRegistryEntry, ConfigQuizRegistryEntry } from "../components/quiz/types";
 
 /**
- * All registered quizzes (component-based - legacy)
- * Note: These are kept for backwards compatibility but not shown in UI
+ * All registered quizzes (component-based)
  */
-export const QUIZ_REGISTRY: QuizRegistryEntry[] = [];
+export const QUIZ_REGISTRY: QuizRegistryEntry[] = [
+  {
+    id: "accessibility-audit",
+    title: "Accessibility Audit",
+    emoji: "♿",
+    description: "Find accessibility issues and learn WCAG guidelines",
+    slug: "accessibility-audit",
+    themeColor: "amethyst",
+    loadConfig: () => import("./accessibility-audit"),
+  },
+];
 
 /**
  * Config-driven quizzes (new architecture)

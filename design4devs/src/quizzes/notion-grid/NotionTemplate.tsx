@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Zone, ZoneContent, useZoneContext } from "../../components/quiz/ZoneRenderer";
 
-const CARDS = [
+const CARD_DATA = [
   { title: "Website Redesign", tags: ["Design", "Q1"], progress: 75, members: 4, tasks: 12, due: "Feb 15", priority: "High" },
   { title: "Mobile App", tags: ["Development"], progress: 40, members: 6, tasks: 24, due: "Mar 1", priority: "Medium" },
   { title: "Brand Guidelines", tags: ["Design", "Branding"], progress: 90, members: 2, tasks: 8, due: "Feb 10", priority: "Low" },

@@ -6,7 +6,7 @@
  * Captures zone screenshots using html2canvas for the answer picker.
  */
 
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 import {
   createContext,
   useContext,
@@ -69,7 +69,6 @@ export function ZoneProvider({
   const captureZone = useCallback(async (zoneId: string): Promise<string | null> => {
     // Check cache first
     if (zoneCaptures.has(zoneId)) {
-      console.log(`Using cached screenshot for zone: ${zoneId}`);
       return zoneCaptures.get(zoneId) || null;
     }
 
@@ -79,8 +78,6 @@ export function ZoneProvider({
       return null;
     }
 
-    console.log(`Capturing zone: ${zoneId}`);
-    
     // Find the zone element - try data-zone first, then data-zone-id
     let element = document.querySelector(`[data-zone="${zoneId}"]`) as HTMLElement;
     if (!element) {
@@ -88,7 +85,6 @@ export function ZoneProvider({
     }
     if (!element) {
       console.error(`Zone element not found for: ${zoneId}`);
-      console.log('Available zones:', Array.from(document.querySelectorAll('[data-zone]')).map(el => el.getAttribute('data-zone')));
       return null;
     }
 
@@ -115,7 +111,7 @@ export function ZoneProvider({
       const canvas = await html2canvas(element, {
         backgroundColor: null,
         scale: Math.min(2, 800 / Math.max(rect.width, rect.height)), // Scale down large elements
-        logging: true,
+        logging: false,
         useCORS: true,
         allowTaint: true,
         windowWidth: document.documentElement.scrollWidth,
@@ -128,15 +124,12 @@ export function ZoneProvider({
         height: rect.height,
       });
 
-      console.log(`Canvas created for zone ${zoneId}:`, canvas.width, 'x', canvas.height);
-
       // Restore original styles
       element.className = originalClasses;
       element.style.cssText = originalStyle;
 
       const dataUrl = canvas.toDataURL('image/png');
-      console.log(`DataURL created for zone ${zoneId}, length:`, dataUrl.length);
-      
+
       // Cache the capture
       setZoneCaptures(prev => new Map(prev).set(zoneId, dataUrl));
       
@@ -230,7 +223,6 @@ export function Zone({ id, children, className = "", style = {}, as: Tag = "div"
     
     // Capture the zone screenshot before triggering the click handler
     const screenshot = await captureZone(id);
-    console.log('Zone clicked:', id, 'Screenshot captured:', !!screenshot);
     onZoneClick(id, screenshot);
   };
 
