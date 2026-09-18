@@ -1,0 +1,220 @@
+name: Design AI Review
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        description: "PR number to review"
+        required: false
+        type: string
+      design_repo:
+        description: "Design standards repository (org/repo)"
+        required: false
+        type: string
+        default: "fundwave/design"
+      design_repo_branch:
+        description: "Branch of the design standards repository to use"
+        required: false
+        type: string
+        default: "main"
+      allow_draft_prs:
+        description: "Whether to review draft PRs"
+        required: false
+        type: boolean
+        default: false
+      auto_comment:
+        description: "Whether to automatically post review as PR comment"
+        required: false
+        type: boolean
+        default: true
+      fail_fast:
+        description: "Whether to fail the workflow if design issues are found"
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      COPILOT_GITHUB_TOKEN:
+        required: true
+    outputs:
+      successful:
+        description: "Whether the design review successful"
+        value: ${{ jobs.ai-review.outputs.successful || 'true' }}
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to review"
+        required: true
+        type: string
+      design_repo:
+        description: "Design standards repository (org/repo)"
+        required: false
+        type: string
+        default: "fundwave/design"
+      design_repo_branch:
+        description: "Branch of the design standards repository to use"
+        required: false
+        type: string
+        default: "main"
+      allow_draft_prs:
+        description: "Whether to review draft PRs"
+        required: false
+        type: boolean
+        default: false
+      auto_comment:
+        description: "Whether to automatically post review as PR comment"
+        required: false
+        type: boolean
+        default: true
+      fail_fast:
+        description: "Whether to fail the workflow if design issues are found"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  context-validation:
+    name: Validate Prerequisites
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.validate-pr.outputs.pr_number }}
+      review_required: ${{ steps.design-gate.outputs.review_required }}
+    steps:
+      - name: Validate pull request context
+        id: validate-pr
+        run: |
+          PR_NUMBER="${{ inputs.pr_number }}"
+
+          if [ -z "$PR_NUMBER" ]; then
+            echo "::error::No PR number available. You must provide pr_number input (via workflow_dispatch or workflow_call)."
+            exit 1
+          fi
+
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+          echo "✓ Pull request context validated: PR #$PR_NUMBER"
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Determine if design review is required
+        id: design-gate
+        run: |
+          gh pr view "$PR_NUMBER" --json title,isDraft > pr.json || { echo "::error::PR #$PR_NUMBER not found"; exit 1; }
+          [ "${RUNNER_DEBUG:-0}" = "1" ] && cat pr.json || true
+
+          IS_DRAFT=$(jq -r '.isDraft' pr.json)
+          if [ "$IS_DRAFT" = "true" ] && [ "${{ inputs.allow_draft_prs }}" != "true" ]; then
+            echo "⊘ Draft PR - skipping review (allow_draft_prs is false)"
+            echo "review_required=false" >> $GITHUB_OUTPUT
+          else
+            echo "review_required=true" >> $GITHUB_OUTPUT
+          fi
+
+  ai-review:
+    name: Run AI Design Review
+    needs: [context-validation]
+    if: needs.context-validation.outputs.review_required == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    outputs:
+      successful: ${{ steps.evaluate-result.outputs.successful }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Checkout design standards repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.design_repo || github.repository }}
+          ref: ${{ inputs.design_repo_branch || github.ref_name }}
+          path: design-repo
+          sparse-checkout: "instructions"
+
+      - name: Fetch full PR details
+        id: fetch-pr-details
+        run: |
+          gh pr view ${{ needs.context-validation.outputs.pr_number }} \
+            --json title,labels,body,files > pr.json
+
+      - name: Checkout PR branch
+        id: checkout-pr
+        run: |
+          gh pr checkout ${{ needs.context-validation.outputs.pr_number }} -R ${{ github.repository }}
+          echo "✓ Checked out PR #${{ needs.context-validation.outputs.pr_number }}"
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install GitHub Copilot CLI
+        id: install-copilot
+        run: npm i -g @github/copilot
+
+      - name: Build AI review prompt
+        id: build-prompt
+        run: |
+          cat design-repo/instructions/pr-prompt.md > prompt.md
+          printf '\n\n---\n\n' >> prompt.md
+          cat design-repo/instructions/guidelines.md >> prompt.md
+          printf '\n\n---\n\n' >> prompt.md
+          cat design-repo/instructions/checklist.md >> prompt.md
+          printf '\n\n---\n\nPR DETAILS\n' >> prompt.md
+          echo '```json' >> prompt.md
+          cat pr.json >> prompt.md
+          echo '```' >> prompt.md
+          [ "${RUNNER_DEBUG:-0}" = "1" ] && printf '\n\n---\n\nDEBUG=true\n' >> prompt.md || true
+
+      - name: Execute AI design review
+        id: run-copilot-review
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          COPILOT_PROMPT=$(cat prompt.md)
+          [ "${RUNNER_DEBUG:-0}" = "1" ] && echo "$COPILOT_PROMPT" || true
+          copilot -p "$COPILOT_PROMPT" \
+            --allow-tool 'read' --allow-tool 'view' --allow-tool 'grep' --allow-tool 'glob' \
+            --deny-tool 'shell' --deny-tool 'write' --deny-tool 'web_fetch' --deny-tool 'web_search' \
+            > review.md
+
+      - name: Verify review output does not leak secrets
+        id: scrub-secrets
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          if [ -n "$COPILOT_GITHUB_TOKEN" ] && grep -qF "$COPILOT_GITHUB_TOKEN" review.md; then
+            echo "::error::Review output contains the COPILOT_GITHUB_TOKEN secret value - refusing to post it. This likely indicates a prompt-injection attempt via the PR title/body/files."
+            exit 1
+          fi
+
+      - name: Post review as PR comment
+        id: post-comment
+        if: inputs.auto_comment == true
+        run: |
+          [ "${RUNNER_DEBUG:-0}" = "1" ] && cat review.md || true
+          gh pr comment ${{ needs.context-validation.outputs.pr_number }} --body-file review.md
+
+      - name: Evaluate review result
+        id: evaluate-result
+        run: |
+          if grep -q "NOT READY" review.md; then
+            echo "successful=false" >> $GITHUB_OUTPUT
+            if [ "${{ inputs.fail_fast }}" = "true" ]; then
+              echo "::error::Design review failed - issues found"
+              exit 1
+            else
+              echo "::warning::Design review found issues but fail_fast is false"
+            fi
+          else
+            echo "successful=true" >> $GITHUB_OUTPUT
+          fi

@@ -1,0 +1,29 @@
+## Example: calling the reusable Design AI Review workflow from another repo.
+## Copy this file into that repo's .github/workflows/ and adjust as needed.
+## See ../../instructions/README.md and the root README.md for full docs.
+
+name: Design AI Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to review"
+        required: true
+        type: string
+
+jobs:
+  design-review:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: fundwave/design/.github/workflows/design-ai-review.yml@main
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    with:
+      pr_number: ${{ inputs.pr_number || github.event.pull_request.number }}
+      allow_draft_prs: false
+      auto_comment: true
+      fail_fast: true
